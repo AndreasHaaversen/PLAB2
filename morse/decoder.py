@@ -8,7 +8,6 @@ _symbol_pause = 3
 _word_pause = 4
 _reset = 5
 
-#this is a test
 # Morse Code Class
 class morseDecoder():
 
