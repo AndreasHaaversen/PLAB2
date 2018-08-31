@@ -22,22 +22,24 @@ class morseDecoder():
                '00001':'4','00000':'5','10000':'6','11000':'7','11100':'8','11110':'9','11111':'0'}
 
 
-# Class method
-def connect():
-    for i in range(100):
-        try:
-            arduino = serial.Serial('COM' + str(i), 9600, timeout=.1)
-            print("Connected to arduino")
-            return arduino
-        except serial.SerialException:
-            pass
-    exit("Arduino was not found")
+
+    # Static method
+    @staticmethod
+    def connect():
+        for i in range(100):
+            try:
+                arduino = serial.Serial('COM' + str(i), 9600, timeout=.1)
+                print("Connected to arduino")
+                return arduino
+            except serial.SerialException:
+                pass
+        exit("Arduino was not found")
 
     #Instance methods
 	# This is where you set up the connection to the serial port.
     def __init__(self,sport=True):
         if sport:
-            self.serial_port = connect()
+            self.serial_port = self.connect()
         self.reset()
 
     def reset(self):
@@ -66,9 +68,28 @@ def connect():
             for byte in s:
                 self.process_signal(int(chr(byte)))
 
-                
-    def process_signal(self,sig): return True
+    def process_signal(self, sig):
+        if(sig == _dot):
+            self.current_symbol += '0'
+        elif(sig == _dash):
+            self.current_symbol += '1'
+        elif(sig == _symbol_pause):
+            self.current_word += self._morse_codes[self.current_symbol]
+            print(self._morse_codes[self.current_symbol])
+            self.current_symbol = ''
+        elif(sig == _word_pause):
+            self.current_message += self.current_word
+            print(self.current_word)
+            self.current_word = ''
+        else:
+            print(self.current_message)
+            self.reset()
 
+def main():
+    run = True
+    decoder = morseDecoder()
+    print("Welcome to the morse decoder!")
+    print("The system will start momentarly. Please wait.")
+    decoder.decoding_loop()
 
-
-     
+main()
