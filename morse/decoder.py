@@ -83,10 +83,10 @@ class morseDecoder():
             self.current_word = ''
         else:
             print(self.current_message)
+            print("\nMessage recived. System is resetting")
             self.reset()
 
 def main():
-    run = True
     decoder = morseDecoder()
     print("Welcome to the morse decoder!")
     print("The system will start momentarly. Please wait.")
