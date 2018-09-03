@@ -74,22 +74,36 @@ class morseDecoder():
         elif(sig == _dash):
             self.current_symbol += '1'
         elif(sig == _symbol_pause):
-            self.current_word += self._morse_codes[self.current_symbol]
-            print(self._morse_codes[self.current_symbol])
+            try:
+                self.current_word += self._morse_codes[self.current_symbol]
+                print(self._morse_codes[self.current_symbol])
+            except KeyError:
+                print(self.current_symbol + " Is not a valid key")
             self.current_symbol = ''
         elif(sig == _word_pause):
-            self.current_message += self.current_word
+            self.symbolCleanup()
+            self.current_message += self.current_word + ' '
             print(self.current_word)
             self.current_word = ''
         else:
+            self.symbolCleanup()
+            self.current_message += self.current_word
             print(self.current_message)
             print("\nMessage recived. System is resetting")
             self.reset()
 
+    def symbolCleanup(self):
+        if(self.current_symbol != ''):
+            try:
+                self.current_word += self._morse_codes[self.current_symbol]
+                self.current_symbol = ''
+            except KeyError:
+                print("Unable to parse current symbol")
+
 def main():
     decoder = morseDecoder()
     print("Welcome to the morse decoder!")
-    print("The system will start momentarly. Please wait.")
+    #print("The system will start momentarly. Please wait.")
     decoder.decoding_loop()
 
 main()

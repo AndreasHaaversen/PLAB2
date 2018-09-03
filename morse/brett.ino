@@ -20,18 +20,17 @@ void setup() {
     pinMode(buttonIn, INPUT_PULLUP);
     debouncer.attach(buttonIn);
     debouncer.interval(5);
-    Serial.print("Start!");
 }
 
 void loop() {
     debouncer.update();
     if(debouncer.fell()){
-        if(pause > 4.5*T){
+        if(pause > 3.5*T && pause <6.5*T){
             Serial.print(3);
-        } else if( pause > 4.5*T && pause < 7*T){
-        Serial.print(4);
-        } else if (pause > 7*T){
-        Serial.print(5);
+        } else if( pause > 6.5*T && pause < 9.5*T){
+            Serial.print(4);
+        } else if (pause > 10*T){
+            Serial.print(5);
     }
         buttonPress = 0;
     } else if(debouncer.rose()) {
@@ -49,10 +48,12 @@ void loop() {
 
 void flashDot() {
     digitalWrite(dotOut, HIGH);
+    delay(100);
     digitalWrite(dotOut, LOW);
 }
 
 void flashDash() {
     digitalWrite(dashOut, HIGH);
+    delay(100);
     digitalWrite(dashOut, LOW);
 }
