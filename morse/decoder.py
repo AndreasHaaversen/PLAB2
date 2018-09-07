@@ -43,9 +43,9 @@ class morseDecoder():
         self.reset()
 
     def reset(self):
-        self.current_message = ''
-        self.current_word = ''
-        self.current_symbol = ''
+        self.__current_message = ''
+        self.__current_word = ''
+        self.__current_symbol = ''
 
     # This should receive an integer in range 1-4 from the Arduino via a serial port
     def read_one_signal(self,port=None):
@@ -68,35 +68,39 @@ class morseDecoder():
             for byte in s:
                 self.process_signal(int(chr(byte)))
 
+
+    # Simple else-if tree for decoding incoming data
     def process_signal(self, sig):
         if(sig == _dot):
-            self.current_symbol += '0'
+            self.__current_symbol += '0'
         elif(sig == _dash):
-            self.current_symbol += '1'
+            self.__current_symbol += '1'
         elif(sig == _symbol_pause):
             try:
-                self.current_word += self._morse_codes[self.current_symbol]
-                print(self._morse_codes[self.current_symbol])
+                self.__current_word += self._morse_codes[self.__current_symbol]
+                print(self._morse_codes[self.__current_symbol])
             except KeyError:
-                print(self.current_symbol + " Is not a valid key")
-            self.current_symbol = ''
+                print(self.__current_symbol + " Is not a valid key")
+            self.__current_symbol = ''
         elif(sig == _word_pause):
             self.symbolCleanup()
-            self.current_message += self.current_word + ' '
-            print(self.current_word)
-            self.current_word = ''
+            self.__current_message += self.__current_word+ ' '
+            print(self.__current_word)
+            self.__current_word = ''
         else:
             self.symbolCleanup()
-            self.current_message += self.current_word
-            print(self.current_message)
+            self.__current_message += self.__current_word
+
+            print(self.__current_message)
             print("\nMessage recived. System is resetting")
             self.reset()
 
+    # Cleans the symbol buffer, and adds any remaining symbols in the buffer to the current word.
     def symbolCleanup(self):
-        if(self.current_symbol != ''):
+        if(self.__current_symbol != ''):
             try:
-                self.current_word += self._morse_codes[self.current_symbol]
-                self.current_symbol = ''
+                self.__current_word += self._morse_codes[self.__current_symbol]
+                self.__current_symbol = ''
             except KeyError:
                 print("Unable to parse current symbol")
 
