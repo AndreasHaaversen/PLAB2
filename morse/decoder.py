@@ -107,7 +107,6 @@ class morseDecoder():
 def main():
     decoder = morseDecoder()
     print("Welcome to the morse decoder!")
-    #print("The system will start momentarly. Please wait.")
     decoder.decoding_loop()
 
 main()
