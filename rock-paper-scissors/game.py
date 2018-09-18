@@ -29,9 +29,10 @@ class Single_Game:
 
 def main():
     player1 = players.randomPlayer()
-    player2 = players.randomPlayer()
+    player2 = players.Most_Common()
     game = Single_Game(player1,player2)
-    game.play_game()
-    print(game)
+    for i in range(1, 20):
+        game.play_game()
+        print(game)
 
 main()

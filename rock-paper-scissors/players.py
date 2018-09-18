@@ -26,7 +26,7 @@ class randomPlayer(Player):
         super().__init__()
 
     def choose_action(self):
-        return actions.Action(random.randint(0, len(self.actions)))
+        return actions.Action(random.randint(0, len(self.actions)-1))
 
     def recive_result(self, own_action, other_action, winner):
         pass
