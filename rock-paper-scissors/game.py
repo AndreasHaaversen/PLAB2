@@ -1,5 +1,6 @@
 import actions
 import players
+import matplotlib.pyplot as plt
 
 class Single_Game:
     def __init__(self, player1, player2):
@@ -7,32 +8,125 @@ class Single_Game:
         self.action1 = None
         self.player2 = player2
         self.action2 = None
-        self.winner = 'Nobody'
+        self.winner = None
+        self.winnerStr = 'Nobody'
 
     def play_game(self):
         self.action1 = self.player1.choose_action()
         self.action2 = self.player2.choose_action()
         if self.action1 < self.action2:
-            self.player1.recive_result(self.action1, self.action2, self.player2)
-            self.player2.recive_result(self.action2, self.action1, self.player2)
-            self.winner = self.player2.get_name()
+            self.winner = self.player2
+            self.player1.recive_result(self.action1, self.action2)
+            self.player2.recive_result(self.action2, self.action1)
+            self.winnerStr = self.winner.get_name()
         elif self.action1 == self.action2:
-            self.player1.recive_result(self.action1, self.action2, None)
-            self.player2.recive_result(self.action2, self.action1, None)
+            self.winner = None
+            self.player1.recive_result(self.action1, self.action2)
+            self.player2.recive_result(self.action2, self.action1)
+            self.winnerStr = 'Nobody'
         else:
-            self.player1.recive_result(self.action1, self.action2, self.player1)
-            self.player2.recive_result(self.action2, self.action1, self.player1)
-            self.winner = self.player1.get_name()
+            self.winner = self.player1
+            self.player1.recive_result(self.action1, self.action2)
+            self.player2.recive_result(self.action2, self.action1)
+            self.winnerStr = self.winner.get_name()
 
     def __str__(self):
         return self.player1.get_name() + ': ' + self.action1.__str__() +'. ' + self.player2.get_name() +': '+ self.action2.__str__() + '. -> ' + self.winner + ' wins.'
 
-def main():
-    player1 = players.randomPlayer()
-    player2 = players.Most_Common()
-    game = Single_Game(player1,player2)
-    for i in range(1, 20):
-        game.play_game()
-        print(game)
+class Tournament:
+    def __init__(self):
+        self.player1 = None
+        self.player2 = None
+        self.num_games = 0
+        self.win_history = []
+        self.win_rate = [] 
 
+    def set_players(self):
+        player_types = [players.randomPlayer, players.sequentialPlayer, players.Most_Common, players.Historian]
+        while self.player1 == None:
+            print("Please select the first player type from the following list by number:")
+            i = 0
+            for element in player_types:
+                print(str(i) + ": "+element.get_name(element))
+                i += 1
+            choice = input(">> ")
+            if int(choice) in range(0,len(player_types)):
+                self.player1 = self.choose_new_player(int(choice))
+        while self.player2 == None:
+            print("Please select the second player type from the following list by number:")
+            i = 0
+            for element in player_types:
+                print(str(i) + ": "+element.get_name(element))
+                i += 1
+            choice = input(">> ")
+            if int(choice) in range(0,len(player_types)):
+                self.player2 = self.choose_new_player(int(choice))
+
+    def choose_new_player(self, n):
+        player = None
+        if(n == 0):
+            player = players.randomPlayer()
+        elif n == 1:
+            player = players.sequentialPlayer()
+        elif n == 2:
+            player = players.Most_Common()
+        elif n == 3:
+            i = 0
+            while i == 0:
+                print("How much memory should the historian have?")
+                choice = input(">> ")
+                if int(choice) > 0:
+                    i = int(choice)
+                    player = players.Historian(i)
+        return player
+    
+    
+    def set_n_games(self):
+        while self.num_games == 0:
+            print("How many games would you like to play?")
+            choice = input(">>")
+            try:
+                choice = int(choice)
+                if(choice < 0):
+                    raise TypeError("Cannot be less than zero")
+                self.num_games = choice
+            except TypeError:
+                print("Invalid input. Try again")
+
+    def plot(self):
+        plt.axhline(y=0.5, color = 'r', linestyle =':')
+        plt.plot(self.win_rate)
+        plt.ylabel(self.player1.get_name() + "Win rate")
+        plt.axis([0, len(self.win_rate)-1, 0 , 1])
+        plt.show()
+        
+    def calc_winrate(self):
+        i = 0
+        temp_sum = 0
+        for element in self.win_history:
+            i += 1
+            if(element == 1):
+                temp_sum += element
+            self.win_rate.append(temp_sum/i)
+    
+    def play(self):
+        self.set_players()
+        self.set_n_games()
+        self.game = Single_Game(self.player1, self.player2)
+        for j in range(0, self.num_games):
+            self.game.play_game()
+            if self.game.winner == self.player1:
+                self.win_history.append(1)
+            elif self.game.winner == self.player2:
+                self.win_history.append(2)
+            else:
+                self.win_history.append(0)
+        self.calc_winrate()
+        print(self.win_rate)
+        print(self.win_history)
+        self.plot()
+
+def main():
+    game = Tournament()
+    game.play()
 main()

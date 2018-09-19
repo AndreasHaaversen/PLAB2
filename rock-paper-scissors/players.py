@@ -13,7 +13,7 @@ class Player(ABC):
         pass
 
     @abstractmethod
-    def recive_result(self, own_action, other_action, winner):
+    def recive_result(self, own_action, other_action):
         pass
     
     @abstractmethod
@@ -26,9 +26,9 @@ class randomPlayer(Player):
         super().__init__()
 
     def choose_action(self):
-        return actions.Action(random.randint(0, len(self.actions)-1))
+        return actions.Action(random.randint(0, 2))
 
-    def recive_result(self, own_action, other_action, winner):
+    def recive_result(self, own_action, other_action):
         pass
     
     def get_name(self):
@@ -37,8 +37,8 @@ class randomPlayer(Player):
 class sequentialPlayer(Player):
     
     def __init__(self):
-        super().__init__()
         self.lastAction = actions.Action(0)
+        super().__init__()
 
     def choose_action(self):
         if self.lastAction.value + 1 == len(self.actions):
@@ -48,7 +48,7 @@ class sequentialPlayer(Player):
         self.lastAction = actions.Action(index)
         return actions.Action(index)
 
-    def recive_result(self, own_action, other_action, winner):
+    def recive_result(self, own_action, other_action):
         pass
     
     def get_name(self):
@@ -57,45 +57,40 @@ class sequentialPlayer(Player):
 class Most_Common(Player):
 
     def __init__(self):
-        self.counts = defaultdict(int)
+        self.counts = {"Rock": 0, "Scissors": 0, "Paper": 0}
         super().__init__()
 
     def choose_action(self):
-        if self.counts.keys() != []:
-            common = max(self.counts.keys, key = (lambda x: self.counts[x]))
-            beats_common = common.who_beats_me()
-            return actions.Action(beats_common)
-        else:
-            return self.actions[random.randint(0, len(self.actions))]
+        action = actions.Action(max(self.counts, key=lambda key: self.counts[key]))
+        return actions.Action(action.who_beats_me())
     
-    def recive_result(self, own_action, other_action, winner):
-        self.counts[other_action] += 1
+    def recive_result(self, own_action, other_action):
+        self.counts[str(other_action)] += 1
 
     def get_name(self):
         return "Most common player"
 
 class Historian(Player):
 
-    def __init__(self, husk):
-        self.history = []
+    def __init__(self, husk = 3):
+        self.husk_sequence = [None] * husk
         self.husk = husk
-        self.counts = defaultdict(int)
+        self.counts = {}
         super().__init__()
 
     def choose_action(self):
-        if len(self.history) < self.husk + 1 or self.counts.keys() == [] or not self.history[0] in self.history[1:-1]:
-            return self.actions[random.randint(0, len(self.actions))]
+        if tuple(self.husk_sequence) in self.counts:
+            next_action = actions.Action(max(self.counts[tuple(self.husk_sequence)], key = lambda key:self.counts[tuple(self.husk_sequence)][key]))
+            return actions.Action(next_action.who_beats_me())
         else:
-            possible = defaultdict(1)
-            for tuples in self.counts.keys():
-                if tuples[self.husk] == self.history[self.husk]:
-                    possible[tuples] += 1
-            common = max(possible.keys, key = (lambda x: possible[x]))
-            beats_common = common.who_beats_me()
-            return actions.Action(beats_common)
+            return actions.Action(random.randint(0, 2))
 
-    def recive_result(self, own_action, other_action, winner):
-        self.history.append(other_action)
-        if len(self.history) >= self.husk + 1:
-            for i in range(0, len(self.history), 3):
-                self.counts[tuple(self.history[i:i + self.husk + 1])]
+    def recive_result(self, own_action, other_action):
+        if not (tuple(self.husk_sequence) in self.counts):
+            self.counts[tuple(self.husk_sequence)] = {"Rock": 0, "Scissors": 0, "Paper": 0}
+        self.counts[tuple(self.husk_sequence)][str(other_action)] += 1
+        self.husk_sequence.append(str(other_action))
+        self.husk_sequence.pop(0)
+    
+    def get_name(self):
+        return "Historian"
