@@ -41,6 +41,7 @@ class Tournament:
     def __init__(self):
         self.player1 = None
         self.player2 = None
+        self.game = None
         self.num_games = 0
         self.win_history = []
         self.win_rate = [] 
