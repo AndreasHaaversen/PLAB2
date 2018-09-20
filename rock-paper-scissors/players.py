@@ -3,6 +3,7 @@ from collections import defaultdict
 import actions
 import random
 
+# Abstract superclass, all other player classes inherits from this one.
 class Player(ABC):
     def __init__(self):
         self.actions =  {'Rock': 0, 'Scissors': 1, 'Paper': 2}
@@ -20,6 +21,7 @@ class Player(ABC):
     def get_name(self):
         pass
 
+# Chooses actions randomly using randint
 class randomPlayer(Player):
 
     def __init__(self):
@@ -34,6 +36,7 @@ class randomPlayer(Player):
     def get_name(self):
         return "Random player"
     
+# Sequentially chooses the next action based on the last.
 class sequentialPlayer(Player):
     
     def __init__(self):
@@ -54,6 +57,7 @@ class sequentialPlayer(Player):
     def get_name(self):
         return "Sequential player"
 
+# Using a dict, chooses the winning move against the move that the opponent uses the most.
 class Most_Common(Player):
 
     def __init__(self):
@@ -70,8 +74,8 @@ class Most_Common(Player):
     def get_name(self):
         return "Most common player"
 
+# Using a dict and a squence of remembered moves, predicts the most likely next move.
 class Historian(Player):
-
     def __init__(self, husk = 3):
         self.husk_sequence = [None] * husk
         self.husk = husk

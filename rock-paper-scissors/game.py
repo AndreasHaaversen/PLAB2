@@ -2,6 +2,7 @@ import actions
 import players
 import matplotlib.pyplot as plt
 
+# Class for containing and executing a single game. Takes two players as arguments, can play successive games
 class Single_Game:
     def __init__(self, player1, player2):
         self.player1 = player1
@@ -11,6 +12,7 @@ class Single_Game:
         self.winner = None
         self.winnerStr = 'Nobody'
 
+    # Asks the players for their actions, then finds the winner
     def play_game(self):
         self.action1 = self.player1.choose_action()
         self.action2 = self.player2.choose_action()
@@ -30,9 +32,11 @@ class Single_Game:
             self.player2.recive_result(self.action2, self.action1)
             self.winnerStr = self.winner.get_name()
 
+    # Textual representation of the current game state
     def __str__(self):
         return self.player1.get_name() + ': ' + self.action1.__str__() +'. ' + self.player2.get_name() +': '+ self.action2.__str__() + '. -> ' + self.winner + ' wins.'
 
+# Class for simulating a series of games. Takes no arguments, all attributes are set by the user.
 class Tournament:
     def __init__(self):
         self.player1 = None
@@ -41,6 +45,7 @@ class Tournament:
         self.win_history = []
         self.win_rate = [] 
 
+    # Asks the user for the type of players they want.
     def set_players(self):
         player_types = [players.randomPlayer, players.sequentialPlayer, players.Most_Common, players.Historian]
         while self.player1 == None:
@@ -62,6 +67,7 @@ class Tournament:
             if int(choice) in range(0,len(player_types)):
                 self.player2 = self.choose_new_player(int(choice))
 
+    # Helpermethod for generating new player objects
     def choose_new_player(self, n):
         player = None
         if(n == 0):
@@ -80,7 +86,7 @@ class Tournament:
                     player = players.Historian(i)
         return player
     
-    
+    # Queries the user for the number of games to be played
     def set_n_games(self):
         while self.num_games == 0:
             print("How many games would you like to play?")
@@ -93,6 +99,7 @@ class Tournament:
             except TypeError:
                 print("Invalid input. Try again")
 
+    # Plots the results using matplotlib
     def plot(self):
         plt.axhline(y=0.5, color = 'r', linestyle =':')
         plt.plot(self.win_rate)
@@ -100,6 +107,7 @@ class Tournament:
         plt.axis([0, len(self.win_rate)-1, 0 , 1])
         plt.show()
         
+    # Calculates the winrate for player 1 in range [0,1]
     def calc_winrate(self):
         i = 0
         temp_sum = 0
@@ -109,6 +117,7 @@ class Tournament:
                 temp_sum += element
             self.win_rate.append(temp_sum/i)
     
+    # Main class methon, actually executes the simulation.
     def play(self):
         self.set_players()
         self.set_n_games()
@@ -122,8 +131,6 @@ class Tournament:
             else:
                 self.win_history.append(0)
         self.calc_winrate()
-        print(self.win_rate)
-        print(self.win_history)
         self.plot()
 
 def main():
