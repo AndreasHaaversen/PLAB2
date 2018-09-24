@@ -3,7 +3,7 @@ import people
 
 class Session:
     def __init__(self):
-        self.implemented_ciphers = [ciphers.Caesar]
+        self.implemented_ciphers = [ciphers.Caesar, ciphers.Multiplication, ciphers.Affine]
         self.sender = None
         self.reciver = None
         self.hacker = None
@@ -60,6 +60,10 @@ class Session:
     def generate_cipher(self, n):
         if n == 0:
             return ciphers.Caesar()
+        elif n == 1:
+            return ciphers.Multiplication()
+        elif n == 2:
+            return ciphers.Affine()
 
 if __name__ == "__main__":
     current_session = Session()

@@ -51,6 +51,57 @@ class Caesar(Cipher):
     def get_name(self):
         return "Caesar cipher"
 
+class Multiplication(Cipher):
+    def __init__(self):
+        super(Multiplication, self).__init__()
+        self._valid_keys = self.set_keys()
+    
+    def set_keys(self):
+        valid_keys = []
+        for i in range(2,95):
+            if(modular_inverse(i, self.alphabet_size)):
+                valid_keys.append(i)
+        return valid_keys
+    
+    def generate_keys(self):
+        return self._valid_keys[random.randint(0,len(self._valid_keys))]
+
+    def encode(self, text, key):
+        if key in self._valid_keys:
+            _int_text = blocks_from_text(text)
+            for i in range(1, len(_int_text)):
+                _int_text[i] -= 32
+                _int_text[i] = (_int_text[i] * key) % self.alphabet_size
+                _int_text[i] += 32
+            return text_from_blocks(_int_text)
+        else:
+            print("Invalid key!")
+    
+    def decode(self, text, key):
+        _inverse_key = modular_inverse(key, self.alphabet_size)
+        return self.encode(text, _inverse_key)
+    
+    def get_name(self):
+        return "Multiplication cipher"
+
+class Affine(Cipher):
+    def __init__(self):
+        self.mult = Multiplication()
+        self.caesar = Caesar()
+        super(Affine, self).__init__()
+
+    def generate_keys(self):
+        return (self.mult.generate_keys(), self.caesar.generate_keys())
+    
+    def encode(self, text, key):
+        return self.caesar.encode(self.mult.encode(text, key[0]), key[1])
+
+    def decode(self, text, key):
+        return self.mult.decode(self.caesar.decode(text, key[1]), key[0])
+
+    def get_name(self):
+        return "Affine cipher"
+
 # Helpermethods
 def modular_inverse(a, m):
     """
@@ -82,8 +133,9 @@ def modular_inverse(a, m):
 
     gcd_value, x, y = extended_gcd(a, m)
     if gcd_value != 1:
-        print('No inverse. gcd (%d, %d) is %d. Decoding is not unique. Choose another key than %d'
-              % (a, m, math.gcd(a, m), a))
+        #print('No inverse. gcd (%d, %d) is %d. Decoding is not unique. Choose another key than %d'
+        #      % (a, m, math.gcd(a, m), a))
+        return 0
     return x % m
 
 
@@ -124,3 +176,7 @@ def text_from_blocks(blocks, no_bits = 1):
             2 * no_bits, byteorder='big', signed=False).decode(
             encoding='UTF-8', errors='ignore').lstrip('\0'))
     return ''.join(_message)
+
+if __name__ == "__main__":
+    cipher = Affine()
+    print(cipher.verify("Hello World", cipher.generate_keys()))
