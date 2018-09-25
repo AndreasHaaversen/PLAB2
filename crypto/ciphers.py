@@ -21,6 +21,10 @@ class Cipher(ABC):
     def generate_keys(self):
         pass
     
+    @abstractmethod
+    def get_valid_keys(self):
+        pass
+    
     def verify(self, text, key):
         return self.decode(self.encode(text, key),key) == text
     
@@ -30,11 +34,10 @@ class Cipher(ABC):
 
 class Caesar(Cipher):
     def __init__(self):
-        self.__key_range = (1, 95)
         super(Caesar, self).__init__()
 
     def generate_keys(self):
-        return random.randint(self.__key_range[0], self.__key_range[1])
+        return random.randint(1, self.alphabet_size)
 
     def encode(self, text, key):
         int_text = blocks_from_text(text)
@@ -47,6 +50,9 @@ class Caesar(Cipher):
     def decode(self, text, key):
         new_key = self.alphabet_size - key
         return self.encode(text, new_key)
+    
+    def get_valid_keys(self):
+        return {x for x in range(1, self.alphabet_size + 1)}
     
     def __str__(self):
         return "Caesar cipher"
@@ -80,6 +86,9 @@ class Multiplication(Cipher):
     def decode(self, text, key):
         _inverse_key = modular_inverse(key, self.alphabet_size)
         return self.encode(text, _inverse_key)
+
+    def get_valid_keys(self):
+        return set(self._valid_keys)
     
     def __str__(self):
         return "Multiplication cipher"
@@ -99,6 +108,15 @@ class Affine(Cipher):
     def decode(self, text, key):
         return self.mult.decode(self.caesar.decode(text, key[1]), key[0])
 
+    def get_valid_keys(self):
+        mult_keys = self.mult.get_valid_keys()
+        caesar_keys = self.caesar.get_valid_keys()
+        out = set()
+        for cKey in caesar_keys:
+            for mKey in mult_keys:
+                out.add((mKey, cKey))
+        return out
+
     def __str__(self):
         return "Affine cipher"
 
@@ -107,32 +125,45 @@ class Unbreakable(Cipher):
         super(Unbreakable, self).__init__()
 
     def encode(self, text, key):
-        _int_key = self.generate_matching_key_array(key, len(text))
         _int_text = blocks_from_text(text)
-        for i, j in zip(_int_key, _int_text):
-            _int_text[j] = (_int_key[i] + _int_text[j])&self.alphabet_size
+        _int_key = blocks_from_text(self.generate_matching_key(key, len(text)))
+        for i in range(0, len(text)):
+            _int_text[i] -= 32
+            _int_key[i] -= 32
+            _int_text[i] = (_int_text[i] + _int_key[i])% 95
+            _int_text[i] += 32
         return text_from_blocks(_int_text)
-    
+
+
     def decode(self, text, key):
-        key = self.generate_decode_key(key)
+        decodekey = self.generate_decode_key(key)
+        return self.encode(text, decodekey)
 
 
-    def generate_matching_key_array(self, key, length):
-        _int_key = blocks_from_text(key)
-        out = []
-        for i in range(0, len(_int_key)):
-            out.append(_int_key[i%len(_int_key)])
+    def generate_matching_key(self, key, length):
+        out = ""
+        for i in range(length):
+            out += key[i % len(key)]
         return out
 
     def generate_decode_key(self, key):
         _int_key = blocks_from_text(key)
         for i in range(0, len(_int_key)):
-            _int_key = (self.alphabet_size - _int_key[i])%self.alphabet_size
+            _int_key[i] -= 32
+            _int_key[i] = ((self.alphabet_size - (_int_key[i])) % self.alphabet_size)
+            _int_key[i] += 33
         return text_from_blocks(_int_key)
 
     def generate_keys(self):
         key = input("Please select a key\n>> ")
-        return key
+        return key.rstrip().lower()
+    
+    def get_valid_keys(self):
+        out = set()
+        with open('english_words.txt', 'r') as file:
+            for line in file:
+                out.add(line.rstrip())
+        return out
 
     def __str__(self):
         return "Unbreakable cipher"
@@ -212,6 +243,3 @@ def text_from_blocks(blocks, no_bits = 1):
             encoding='UTF-8', errors='ignore').lstrip('\0'))
     return ''.join(_message)
 
-if __name__ == "__main__":
-    cipher = Unbreakable()
-    print(cipher.verify("Hello World", cipher.generate_keys()))
