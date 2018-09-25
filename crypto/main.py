@@ -15,7 +15,7 @@ class Session:
         while _cipher == None:
             i = 0
             for element in self.implemented_ciphers:
-                print(str(i) + ": "+element.get_name(element))
+                print(str(i) + ": "+ element)
                 i += 1
             choice = input(">> ")
             try:

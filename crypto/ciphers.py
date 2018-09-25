@@ -25,7 +25,7 @@ class Cipher(ABC):
         return self.decode(self.encode(text, key),key) == text
     
     @abstractmethod
-    def get_name(self):
+    def __str__(self):
         pass
 
 class Caesar(Cipher):
@@ -48,7 +48,7 @@ class Caesar(Cipher):
         new_key = self.alphabet_size - key
         return self.encode(text, new_key)
     
-    def get_name(self):
+    def __str__(self):
         return "Caesar cipher"
 
 class Multiplication(Cipher):
@@ -81,7 +81,7 @@ class Multiplication(Cipher):
         _inverse_key = modular_inverse(key, self.alphabet_size)
         return self.encode(text, _inverse_key)
     
-    def get_name(self):
+    def __str__(self):
         return "Multiplication cipher"
 
 class Affine(Cipher):
@@ -99,8 +99,43 @@ class Affine(Cipher):
     def decode(self, text, key):
         return self.mult.decode(self.caesar.decode(text, key[1]), key[0])
 
-    def get_name(self):
+    def __str__(self):
         return "Affine cipher"
+
+class Unbreakable(Cipher):
+    def __init__(self):
+        super(Unbreakable, self).__init__()
+
+    def encode(self, text, key):
+        _int_key = self.generate_matching_key_array(key, len(text))
+        _int_text = blocks_from_text(text)
+        for i, j in zip(_int_key, _int_text):
+            _int_text[j] = (_int_key[i] + _int_text[j])&self.alphabet_size
+        return text_from_blocks(_int_text)
+    
+    def decode(self, text, key):
+        key = self.generate_decode_key(key)
+
+
+    def generate_matching_key_array(self, key, length):
+        _int_key = blocks_from_text(key)
+        out = []
+        for i in range(0, len(_int_key)):
+            out.append(_int_key[i%len(_int_key)])
+        return out
+
+    def generate_decode_key(self, key):
+        _int_key = blocks_from_text(key)
+        for i in range(0, len(_int_key)):
+            _int_key = (self.alphabet_size - _int_key[i])%self.alphabet_size
+        return text_from_blocks(_int_key)
+
+    def generate_keys(self):
+        key = input("Please select a key\n>> ")
+        return key
+
+    def __str__(self):
+        return "Unbreakable cipher"
 
 # Helpermethods
 def modular_inverse(a, m):
@@ -178,5 +213,5 @@ def text_from_blocks(blocks, no_bits = 1):
     return ''.join(_message)
 
 if __name__ == "__main__":
-    cipher = Affine()
+    cipher = Unbreakable()
     print(cipher.verify("Hello World", cipher.generate_keys()))
