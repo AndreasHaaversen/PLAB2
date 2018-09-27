@@ -130,7 +130,7 @@ class Unbreakable(Cipher):
         for i in range(0, len(text)):
             _int_text[i] -= 32
             _int_key[i] -= 32
-            _int_text[i] = (_int_text[i] + _int_key[i])% 95
+            _int_text[i] = (_int_text[i] + _int_key[i])% self.alphabet_size
             _int_text[i] += 32
         return text_from_blocks(_int_text)
 
@@ -151,7 +151,7 @@ class Unbreakable(Cipher):
         for i in range(0, len(_int_key)):
             _int_key[i] -= 32
             _int_key[i] = ((self.alphabet_size - (_int_key[i])) % self.alphabet_size)
-            _int_key[i] += 33
+            _int_key[i] += 32
         return text_from_blocks(_int_key)
 
     def generate_keys(self):

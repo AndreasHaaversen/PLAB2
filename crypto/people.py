@@ -42,7 +42,8 @@ class Hacker(Person):
     
     def operate_cipher(self, text, key = None):
         _valid_keys = self.cipher.get_valid_keys()
-        _valid_keys.remove("")
+        if "" in _valid_keys:
+            _valid_keys.remove("")
         for aKey in _valid_keys:
             _decoded_text = self.cipher.decode(text, aKey).lower().split()
             for word in _decoded_text:

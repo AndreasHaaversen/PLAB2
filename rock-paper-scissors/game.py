@@ -53,7 +53,7 @@ class Tournament:
             print("Please select the first player type from the following list by number:")
             i = 0
             for element in player_types:
-                print(str(i) + ": "+element.get_name(element))
+                print(str(i) + ": "+ element.get_name(element))
                 i += 1
             choice = input(">> ")
             if int(choice) in range(0,len(player_types)):
