@@ -1,6 +1,7 @@
 import calculator_utils as CUT
 import numbers
 import numpy
+import re
 
 class Calculator:
     def __init__(self):
@@ -54,3 +55,36 @@ class Calculator:
                 raise TypeError('Cannot recognize element while converting to RPN')
         while not self.operator_stack.is_empty():
             self.output_queue.push(self.operator_stack.pop())
+        
+    def parse_text(self, text):
+        out = []
+        text = text.replace(" ", "").upper()
+        func_targets = "|".join(["^" + func for func in self.functions.keys()])
+        op_targets = "|".join(["^" + op for op in self.operators.keys()])
+        while len(text) > 0:
+            check = re.search("^[-0123456789.]+", text)
+            if check != None:
+                out.append(float(check.group(0)))
+                text = text[check.end(0):]
+            check = re.search(func_targets, text)
+            if check != None:
+                out.append(self.functions[check.group(0)])
+                text = text[check.end(0):]
+            check = re.search(op_targets, text)
+            if check != None:
+                out.append(self.operators[check.group(0)])
+                text = text[check.end(0):]
+            check = re.search("^\\(", text)
+            if check != None:
+                out.append(check.group(0))
+                text = text[check.end(0):]
+            check = re.search("^\\)", text)
+            if check != None:
+                out.append(check.group(0))
+                text = text[check.end(0):]
+        return out
+    
+    def calculate_expression(self, text):
+        elements = self.parse_text(text)
+        self.convert_to_RPN(elements)
+        return self.eval_RPN()

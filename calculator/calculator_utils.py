@@ -52,7 +52,7 @@ class Function:
     def __init__(self, func):
         self.func = func
     
-    def execute(self, element, debug = True):
+    def execute(self, element, debug = False):
         if not isinstance(element, numbers.Number):
             raise TypeError("Cannot execute function on the given argument: " + str(element))
         result = self.func(element)
@@ -65,7 +65,7 @@ class Operator:
         self.op = op
         self.strength = strength
 
-    def execute(self, e1, e2, debug = True):
+    def execute(self, e1, e2, debug = False):
         if not (isinstance(e1, numbers.Number) or isinstance(e2, numbers.Number)):
             raise TypeError("Invalid aguments given to operator: " + str((e1,e2)))
         result = self.op(e1, e2)

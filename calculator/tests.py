@@ -61,5 +61,23 @@ class TestCalculator(unittest.TestCase):
         calc.convert_to_RPN(list2_of_ops)
         self.assertAlmostEqual(1096.63315843, calc.eval_RPN())
 
+    def test_text_parser(self):
+        calc = calculator.Calculator()
+        ex1 = [2.0, calc.operators['GANGE'], 3.0, calc.operators['PLUSS'], 1.0]
+        txt1 = "2.0 GANGE 3.0 PLUSS 1.0"
+        self.assertEqual(ex1, calc.parse_text(txt1))
+        ex2 = [calc.functions['EXP'], '(', 1.0, calc.operators['PLUSS'], 2.0, calc.operators['GANGE'], 3.0, ')']
+        txt2 = "EXP(1.0PLUSS2.0GANGE3.0)"
+        self.assertEqual(ex2, calc.parse_text(txt2))
+
+    def test_complete_system(self):
+        calc = calculator.Calculator()
+        ex1 = "(3 MINUS 5) GANGE 5"
+        ex2 = "EXP(12.2 PLUSS 3 GANGE 1)"
+        ex3 = "SQRT(6 GANGE 6)"
+        self.assertEqual(-10, calc.calculate_expression(ex1))
+        self.assertAlmostEqual(3992786.8352109445, calc.calculate_expression(ex2))
+        self.assertEqual(6, calc.calculate_expression(ex3))
+
 if __name__ == '__main__':
     unittest.main()
