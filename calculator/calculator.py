@@ -66,22 +66,25 @@ class Calculator:
             if check != None:
                 out.append(float(check.group(0)))
                 text = text[check.end(0):]
-            check = re.search(func_targets, text)
-            if check != None:
-                out.append(self.functions[check.group(0)])
-                text = text[check.end(0):]
-            check = re.search(op_targets, text)
-            if check != None:
-                out.append(self.operators[check.group(0)])
-                text = text[check.end(0):]
-            check = re.search("^\\(", text)
-            if check != None:
-                out.append(check.group(0))
-                text = text[check.end(0):]
-            check = re.search("^\\)", text)
-            if check != None:
-                out.append(check.group(0))
-                text = text[check.end(0):]
+            check1 = re.search(func_targets, text)
+            if check1 != None:
+                out.append(self.functions[check1.group(0)])
+                text = text[check1.end(0):]
+            check2 = re.search(op_targets, text)
+            if check2 != None:
+                out.append(self.operators[check2.group(0)])
+                text = text[check2.end(0):]
+            check3 = re.search("^\\(", text)
+            if check3 != None:
+                out.append(check3.group(0))
+                text = text[check3.end(0):]
+            check4 = re.search("^\\)", text)
+            if check4 != None:
+                out.append(check4.group(0))
+                text = text[check4.end(0):]
+            if check == None and check1 == None and check2 == None and check3 == None and check4 == None:
+                print("Could not interpet input.\n\nExiting...")
+                exit()
         return out
     
     def calculate_expression(self, text):

@@ -19,7 +19,7 @@ class Session:
             result = self.calc.calculate_expression(text)
             print("Result: " + str(result))
             while True:
-                print("Want to go again? Y/N")
+                print("\nWant to go again? Y/N")
                 _in = input(">> ").upper()
                 if _in == "Y":
                     break
