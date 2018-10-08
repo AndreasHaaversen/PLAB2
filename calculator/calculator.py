@@ -82,7 +82,11 @@ class Calculator:
             if check4 != None:
                 out.append(check4.group(0))
                 text = text[check4.end(0):]
-            if check == None and check1 == None and check2 == None and check3 == None and check4 == None:
+            check5 = re.search("^PI", text)
+            if check5 != None:
+                out.append(numpy.pi)
+                text = text[check5.end(0):]
+            if check == None and check1 == None and check2 == None and check3 == None and check4 == None and check5 == None:
                 print("Could not interpet input.\n\nExiting...")
                 exit()
         return out

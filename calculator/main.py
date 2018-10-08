@@ -13,6 +13,7 @@ class Session:
         print("\nThese functions are supported:")
         for element in self.calc.functions.keys():
             print(element)
+        print("""\nFor the constant PI, type "PI".""")
         print("\nPlease write everything exactly as described in the supported functions.")
         while _run:
             text = input("Your expression:\n>> ")
