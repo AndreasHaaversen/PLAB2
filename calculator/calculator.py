@@ -9,7 +9,8 @@ class Calculator:
                           'LOG': CUT.Function(numpy.log),
                           'SIN': CUT.Function(numpy.sin),
                           'COS': CUT.Function(numpy.cos),
-                          'SQRT': CUT.Function(numpy.sqrt)}
+                          'SQRT': CUT.Function(numpy.sqrt),
+                          'TAN': CUT.Function(numpy.tan)}
         
         self.operators = {'PLUSS': CUT.Operator(numpy.add, 0),
                           'MINUS': CUT.Operator(numpy.subtract, 0),
@@ -48,11 +49,12 @@ class Calculator:
                     self.output_queue.push(self.operator_stack.pop())
                 self.operator_stack.pop()
             elif isinstance(element, CUT.Operator):
-                while (not self.operator_stack.is_empty()) and (isinstance(self.operator_stack.peek(), CUT.Function) or (isinstance(self.operator_stack.peek(), CUT.Operator) and element.strength < self.operator_stack.peek().strength)):
+                while (not self.operator_stack.is_empty()) and (isinstance(self.operator_stack.peek(), CUT.Function) 
+                        or (isinstance(self.operator_stack.peek(), CUT.Operator) and element.strength < self.operator_stack.peek().strength)):
                     self.output_queue.push(self.operator_stack.pop())
                 self.operator_stack.push(element)
             else:
-                raise TypeError('Cannot recognize element while converting to RPN')
+                raise TypeError('Could not recognize element while converting to RPN: ' +str(element))
         while not self.operator_stack.is_empty():
             self.output_queue.push(self.operator_stack.pop())
         
