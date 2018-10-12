@@ -15,7 +15,9 @@ class Calculator:
         self.operators = {'PLUSS': CUT.Operator(numpy.add, 0),
                           'MINUS': CUT.Operator(numpy.subtract, 0),
                           'GANGE': CUT.Operator(numpy.multiply, 1),
-                          'DELE': CUT.Operator(numpy.divide, 1)}
+                          'DELE': CUT.Operator(numpy.divide, 1),
+                          'MOD': CUT.Operator(numpy.mod, 1),
+                          'RAISE': CUT.Operator(numpy.power, 2)}
 
         self.output_queue = CUT.Queue()
         self.operator_stack = CUT.Stack()
