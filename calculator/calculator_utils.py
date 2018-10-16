@@ -4,7 +4,7 @@ import numbers
 
 class Container(ABC):
     """ Superclass for all containers defined in this module. 
-        All containers, namely Stacks and Queues, inherits from this class."""
+    All containers, namely Stacks and Queues, inherits from this class."""
     def __init__(self):
         self._items = []
         super(Container, self).__init__()
