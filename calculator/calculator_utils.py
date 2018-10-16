@@ -3,7 +3,8 @@ import numbers
 
 
 class Container(ABC):
-
+    """ Superclass for all containers defined in this module. 
+        All containers, namely Stacks and Queues, inherits from this class."""
     def __init__(self):
         self._items = []
         super(Container, self).__init__()
@@ -49,10 +50,15 @@ class Queue(Container):
         return super(Queue, self).pop(position)
     
 class Function:
+    """Single value function. Wrapper for most functions supported by the NumPy library"""
+
     def __init__(self, func):
         self.func = func
     
     def execute(self, element, debug = False):
+        """Executes the operator on the number given
+        :param element: Any floating point or whole number
+        """
         if not isinstance(element, numbers.Number):
             raise TypeError("Cannot execute function on the given argument: " + str(element))
         result = self.func(element)
@@ -61,11 +67,17 @@ class Function:
         return result
     
 class Operator:
+    """Two value operator. Wrapper for most operators supported by the NumPy library"""
+
     def __init__(self, op, strength):
         self.op = op
         self.strength = strength
 
     def execute(self, e1, e2, debug = False):
+        """Executes the operator on the numbers given
+        :param e1: Any floating point or whole number
+        :param e2: Any floating point or whole number
+        """
         if not (isinstance(e1, numbers.Number) or isinstance(e2, numbers.Number)):
             raise TypeError("Invalid aguments given to operator: " + str((e1,e2)))
         result = self.op(e1, e2)
